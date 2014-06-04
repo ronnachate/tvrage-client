@@ -3,7 +3,7 @@ name 'TVRage-Client';
 all_from 'lib/TVRage/Client.pm';
 
 requires 'Moose';
-requires 'Web::Scraper' => '0.37';
+#requires 'Web::Scraper' => '0.37';
 requires 'Path::Class';
 requires 'Moose::Role';
 requires 'URI';
@@ -27,7 +27,7 @@ requires 'aliased';
 requires 'Try::Tiny';
 requires 'DateTime::Duration';
 requires 'List::MoreUtils';
-requires 'HTML::Strip';
+#requires 'HTML::Strip';
 requires 'Clone';
 
 tests 't/*.t';

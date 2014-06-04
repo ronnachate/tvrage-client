@@ -45,13 +45,13 @@ has 'ua' => (
 
 
 sub _build_ua {
-    return LWP::UserAgent->new( timeout => 15 );
+    return LWP::UserAgent->new( timeout => 300 );
 }
 
 sub _build_cache {
     return CHI->new(
         driver     => 'File',
-        expires_in => '60s',
+        expires_in => '3600s',
     );
 }
 
