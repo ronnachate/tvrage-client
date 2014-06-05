@@ -79,6 +79,9 @@ sub _build_mtags {
     push(@$mtags,  { term => "series-id-".$self->id } );
     push(@$mtags,  { term => $self->url_safe_title } );
     push(@$mtags,  { term => "series-".$self->url_safe_title } );
+    foreach my $genre ( @{$self->genres} ) {
+    	push(@$mtags,  { term => $genre } );
+    } 
     return $mtags;
 }
 
@@ -97,7 +100,6 @@ sub _build_genres {
     my $genres = [];
     foreach my $genre ( @{$self->data->{genres}->{genre}} ) {
     	push @$genres, $genre->{text};
-    	print "Push :".$genre->{text}."\n";
     }
     return $genres;
 }
