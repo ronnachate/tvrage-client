@@ -3,6 +3,7 @@ package TVRage::Client::Result::Serie;
 use Moose;
 use DateTime::Format::Atom;
 use TVRage::Client::Result::Image;
+use TVRage::Client::ResultSet::Season;
 use namespace::autoclean;
 
 with 'TVRage::Client::Meta::Urlify';
@@ -60,6 +61,13 @@ has 'url_safe_title' => (
     builder => '_build_url_safe_title',
 );
 
+has 'seasons' => (
+    is => 'ro',
+    isa => 'TVRage::Client::ResultSet::Season',
+    lazy => 1,
+    builder => '_build_seasons',
+);
+
 sub _build_url_safe_title {
     my ($self) = @_;
     return $self->urlify($self->title);
@@ -107,6 +115,12 @@ sub _build_genres {
 sub type {
 	return 'series';
 }
+
+sub _build_seasons{
+    my ($self) = @_;
+    return TVRage::Client::ResultSet::Season->new( { data => $self->data->{Episodelist} , serie => $self });
+}
+
 
 =head2 published
 

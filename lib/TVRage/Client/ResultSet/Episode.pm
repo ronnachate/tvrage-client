@@ -15,6 +15,12 @@ Resultset class for series objects
 
 with 'TVRage::Client::Meta::ResultSet';
 
+has 'season' => (
+    is       => 'ro',
+    isa      => 'TVRage::Client::Result::Season',
+    required => 1,
+);
+
 =head1 METHODS
 
 
@@ -27,7 +33,7 @@ Returns an ArrayRef with Result objects.
 sub items {
     my $self = shift;
     if( $self->data ) {
-    	return [ map { TVRage::Client::Result::Episode->new( data => $_ ) }  values %{$self->data} ];
+    	return [ map { TVRage::Client::Result::Episode->new( { data => $_ , season => $self->season } ) }  values %{$self->data} ];
     }
 }
 
