@@ -23,10 +23,16 @@ Returns an ArrayRef with Result objects.
 
 =cut
 
+has 'client' => (
+    is       => 'ro',
+    isa      => 'TVRage::Client',
+    required => 1,
+);
+
 sub items {
     my $self = shift;
     if( $self->data ) {
-    	return [ map { TVRage::Client::Result::Serie->new( data => $_ ) }  @{$self->data->{shows}->{show}} ];
+    	return [ map { TVRage::Client::Result::Serie->new( { id => $_->{id} , client => $self->client} ) }  @{$self->data->{shows}->{show}} ];
     }
 }
 
