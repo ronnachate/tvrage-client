@@ -33,7 +33,7 @@ Returns an ArrayRef with Result objects.
 sub items {
     my $self = shift;
     if( $self->data ) {
-    	return [ map { TVRage::Client::Result::Episode->new( { data => $_ , season => $self->season } ) }  values %{$self->data} ];
+    	return [ map { TVRage::Client::Result::Episode->new( { data => $_ , season => $self->season } ) }  @{$self->data} ];
     }
 }
 

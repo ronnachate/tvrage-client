@@ -28,16 +28,16 @@ sub _build_number {
     return $self->data->{no};
 }
 
-#has 'episodes' => (
-#    is      => 'ro',
-#    lazy    => 1,
-#    builder => '_build_episodes',
-#);
-#
-#sub _build_episodes {
-#    my ($self) = @_;
-#    return TVRage::Client::ResultSet::Episode->new( data => $self->data->{episode} );
-#}
+has 'episodes' => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_episodes',
+);
+
+sub _build_episodes {
+    my ($self) = @_;
+    return TVRage::Client::ResultSet::Episode->new( { data => $self->data->{episode} , season => $self} );
+}
 
 __PACKAGE__->meta->make_immutable;
 

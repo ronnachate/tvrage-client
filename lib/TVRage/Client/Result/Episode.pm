@@ -16,7 +16,7 @@ has 'data' => (
 
 has 'season' => (
     is       => 'ro',
-    isa      => 'TVRage::Client::Result::Serie',
+    isa      => 'TVRage::Client::Result::Season',
     required => 1,
 );
 #
