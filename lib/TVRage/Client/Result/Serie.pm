@@ -161,14 +161,21 @@ sub as_hashref {
     my $self = shift;
     my %res = (
         map({$_ => $self->$_} qw/id title/),
+        
         published  => DateTime::Format::Atom->format_datetime($self->published),
         updated    => DateTime::Format::Atom->format_datetime($self->updated),
         thumbnails => [ {map {$_ => $self->thumbnails->[0]->$_} qw/url width height/} ],
         mtags    =>  $self->mtags,
+        link     => "http://sumo.tv2.no/sport/live-sport/fotball/",
         hits     => 0,
         duration => 0,
+        summary  => 'test summary',
         type => $self->type,
         url_safe_title => $self->url_safe_title,
+        all_categories => [
+                      { id => "tvguide", term => "tvguide" },
+                      { id => "series", term => "series" },
+                    ],
     );
     return \%res;
 }
