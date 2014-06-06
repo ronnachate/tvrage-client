@@ -1,6 +1,7 @@
 package TVRage::Client::ResultSet::Serie;
 
 use Moose;
+use Try::Tiny;
 use TVRage::Client::Result::Serie;
 =head1 NAME
 
@@ -31,9 +32,17 @@ has 'client' => (
 
 sub items {
     my $self = shift;
+    my $items = [ ];
     if( $self->data ) {
-    	return [ map { TVRage::Client::Result::Serie->new( { id => $_->{id} , client => $self->client} ) }  @{$self->data->{shows}->{show}} ];
+        for my $serie (@{$self->data->{show}}) {
+            try {
+                push(@$items,  TVRage::Client::Result::Serie->new( { id => $serie->{id}->{text} , client => $self->client} ));
+            } catch {
+                warn "caught error: data error for :". $serie->{id}->{text}; # not $@
+            };
+        }
     }
+    return $items;
 }
 
 sub first {

@@ -6,6 +6,7 @@ use TVRage::Client::ResultSet::Serie;
 use TVRage::Client::Result::Season;
 use TVRage::Client::Result::Episode;
 use XML::Hash;
+use Try::Tiny;
 use Encode qw(decode encode);
 
 our $VERSION = '0.01';
@@ -15,7 +16,7 @@ our $VERSION = '0.01';
 has 'base_url'  => (
     is       => 'ro',
     isa      => 'Str',
-    default  => 'http://services.tvrage.com/feeds',
+    default  => 'http://services.tvrage.com',
 );
    
 has 'coder' => (
@@ -39,21 +40,26 @@ Performs a search against
 
 =cut
 
-sub all_series{
+sub all_series {
     my ($self, $id) = @_;
-    my $url = $self->base_url.'/show_list.php';
+    #my $url = $self->base_url.'/show_list.php';
+    my $url = $self->base_url.'/recaps/last_recaps.php?days=100';
     my $result = $self->fetch_result($url);
-    return TVRage::Client::ResultSet::Serie->new({ data => $result, client => $self });
+    return TVRage::Client::ResultSet::Serie->new({ data => $result->{recaps}, client => $self });
 }
 
-sub series_with_id{
+sub series_with_id {
     my ( $self, $id ) = @_;
-    return TVRage::Client::Result::Serie->new({ id => $id, client => $self });
+    try {
+        return TVRage::Client::Result::Serie->new({ id => $id, client => $self });
+    } catch {
+        return undef;
+    };
 }
 
 sub full_series_data {
     my ($self, $id) = @_;
-    my $url = $self->base_url."/full_show_info.php?sid=$id";
+    my $url = $self->base_url."/feeds/full_show_info.php?sid=$id";
     return $self->fetch_result($url);
 }
 

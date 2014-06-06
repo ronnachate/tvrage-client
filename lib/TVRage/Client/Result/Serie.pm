@@ -75,9 +75,16 @@ sub _build_url_safe_title {
 
 sub _build_thumbnails {
     my ($self) = @_;
-    return [ 
-        TVRage::Client::Result::Image->new( url=> $self->data->{image}->{text} ),
-    ];
+    if( $self->data->{image} ) {
+        return [ 
+            TVRage::Client::Result::Image->new( url=> $self->data->{image}->{text} ),
+        ];
+    }
+    else {
+        return [
+            TVRage::Client::Result::Image->new( url=> "http://www.designofsignage.com/application/symbol/building/image/600x600/no-photo.jpg" ),
+        ];
+    }
 }
 
 sub _build_mtags {
@@ -106,8 +113,13 @@ sub _build_title {
 sub _build_genres {
     my ($self) = @_;
     my $genres = [];
-    foreach my $genre ( @{$self->data->{genres}->{genre}} ) {
-    	push @$genres, $genre->{text};
+    if( ref $self->data->{genres}->{genre} eq 'HASH' ) {
+        push @$genres, $self->data->{genres}->{genre}->{text};
+    }
+    elsif ( ref $self->data->{genres}->{genre} eq 'ARRAY' ) {
+        foreach my $genre ( @{$self->data->{genres}->{genre}} ) {
+            push @$genres, $genre->{text};
+        }
     }
     return $genres;
 }
