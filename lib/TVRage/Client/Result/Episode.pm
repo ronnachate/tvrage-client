@@ -54,6 +54,19 @@ has 'url_safe_title' => (
     builder => '_build_url_safe_title',
 );
 
+has 'id' => (
+    is       => 'ro',
+    isa      => 'Int',
+    lazy     => 1,
+    builder  =>  '_build_id',
+);
+
+sub _build_id {
+    my ($self) = @_;
+    return $self->season->serie->id.$self->season->number.$self->number;
+}
+
+
 sub _build_number {
     my ($self) = @_;
     my $ep_number = $self->data->{seasonnum}->{text};
@@ -76,10 +89,8 @@ sub _build_mtags {
     my ($self) = @_;
     my $mtags = [ ];
     my $season_number = $self->season->number;
-    my $ep_number = $self->number;
-    $season_number =~ s/0*(\d+)/$1/;
-    push(@$mtags,  { term => $self->season->serie->url_safe_title.'-s'.$season_number} );
-    push(@$mtags,  { term => $self->season->serie->url_safe_title.'-s'.$season_number.'-e'.$ep_number} );
+    push(@$mtags,  { term => $self->season->serie->url_safe_title.'-s'.$self->season->number} );
+    push(@$mtags,  { term => $self->season->serie->url_safe_title.'-s'.$self->season->number.'-e'.$self->number} );
     push(@$mtags,  { term => $self->url_safe_title } );
     push(@$mtags,  { term => 'episodes' } );
     return $mtags;
@@ -126,7 +137,7 @@ sub updated {
 sub as_hashref {
     my $self = shift;
     my %res = (
-        map({$_ => $self->$_} qw/title number/),
+        map({$_ => $self->$_} qw/id title number/),
         published  => DateTime::Format::Atom->format_datetime($self->published),
         updated    => DateTime::Format::Atom->format_datetime($self->updated),
         thumbnails => [ {map {$_ => $self->thumbnails->[0]->$_} qw/url width height/} ],

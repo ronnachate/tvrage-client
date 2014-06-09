@@ -25,7 +25,8 @@ has 'serie' => (
 
 sub _build_number {
     my ($self) = @_;
-    return $self->data->{no};
+    my $season_number = $self->data->{no};
+    return $season_number =~ s/0*(\d+)/$1/;
 }
 
 has 'episodes' => (
