@@ -2,6 +2,7 @@ package TVRage::Client::Result::Episode;
 
 use Moose;
 use DateTime::Format::Atom;
+use DateTime::Format::Strptime;
 use TVRage::Client::Result::Image;
 use TVRage::Client::Result::Season;
 use namespace::autoclean;
@@ -102,7 +103,12 @@ Returns the published date as a DateTime object
 
 sub published {
     my ($self) = @_;
-    return DateTime->now;
+    my $format = DateTime::Format::Strptime->new(
+        pattern   => '%Y-%m-%d',
+        time_zone => 'local',
+        on_error  => 'croak',
+    );
+    return $format->parse_datetime($self->data->{airdate}->{text});
 }
 
 
