@@ -56,7 +56,8 @@ has 'url_safe_title' => (
 
 sub _build_number {
     my ($self) = @_;
-    return $self->data->{seasonnum}->{text};
+    my $ep_number = $self->data->{seasonnum}->{text};
+    return $ep_number =~ s/0*(\d+)/$1/;
 }
 
 sub _build_url_safe_title {
@@ -77,7 +78,6 @@ sub _build_mtags {
     my $season_number = $self->season->number;
     my $ep_number = $self->number;
     $season_number =~ s/0*(\d+)/$1/;
-    $ep_number =~ s/0*(\d+)/$1/;
     push(@$mtags,  { term => $self->season->serie->url_safe_title.'-s'.$season_number} );
     push(@$mtags,  { term => $self->season->serie->url_safe_title.'-s'.$season_number.'-e'.$ep_number} );
     push(@$mtags,  { term => $self->url_safe_title } );
@@ -126,11 +126,12 @@ sub updated {
 sub as_hashref {
     my $self = shift;
     my %res = (
-        map({$_ => $self->$_} qw/title/),
+        map({$_ => $self->$_} qw/title number/),
         published  => DateTime::Format::Atom->format_datetime($self->published),
         updated    => DateTime::Format::Atom->format_datetime($self->updated),
         thumbnails => [ {map {$_ => $self->thumbnails->[0]->$_} qw/url width height/} ],
         mtags    =>  $self->mtags,
+        summary  => '',
         hits     => 0,
         duration => 0,
         type => $self->type,
