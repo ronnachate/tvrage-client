@@ -32,7 +32,12 @@ Returns an ArrayRef with Result objects.
 sub items {
     my $self = shift;
     if( $self->data ) {
-    	return [ map { TVRage::Client::Result::Season->new( { data => $_ , serie => $self->serie } ) }  @{$self->data->{Season}} ];
+        if( ref $self->data->{Season} eq 'HASH' ) {
+            return [ TVRage::Client::Result::Season->new( { data => $self->data->{Season} , serie => $self->serie } ) ];
+        }
+        elsif ( ref $self->data->{Season} eq 'ARRAY' ) {
+            return [ map { TVRage::Client::Result::Season->new( { data => $_ , serie => $self->serie } ) }  @{$self->data->{Season}} ];
+        }   	
     }
 }
 
