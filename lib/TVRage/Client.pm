@@ -63,6 +63,11 @@ sub full_series_data {
     return $self->fetch_result($url);
 }
 
+sub search_imdb {
+    my ($self, $title) = @_;
+    my $url = 'http://www.omdbapi.com/?r=xml&t='.$title;
+    return $self->fetch_result($url);
+}
 sub fetch_result {
     my ($self, $url) = @_;
     my $uri = URI->new($url);

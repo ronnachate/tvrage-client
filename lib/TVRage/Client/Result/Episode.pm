@@ -73,10 +73,14 @@ sub _build_thumbnails {
 sub _build_mtags {
     my ($self) = @_;
     my $mtags = [ ];
-    push(@$mtags,  { term => $self->season->serie->url_safe_title.'-s'.$self->season->number} );
-    push(@$mtags,  { term => $self->season->serie->url_safe_title.'-s'.$self->season->number.'-e'.$self->number} );
+    my $season_number = $self->season->number;
+    my $ep_number = $self->number;
+    $season_number =~ s/0*(\d+)/$1/;
+    $ep_number =~ s/0*(\d+)/$1/;
+    push(@$mtags,  { term => $self->season->serie->url_safe_title.'-s'.$season_number} );
+    push(@$mtags,  { term => $self->season->serie->url_safe_title.'-s'.$season_number.'-e'.$ep_number} );
     push(@$mtags,  { term => $self->url_safe_title } );
-
+    push(@$mtags,  { term => 'episodes' } );
     return $mtags;
 }
 
@@ -87,7 +91,7 @@ sub _build_title {
 
 
 sub type {
-	return 'episode';
+	return 'episodes';
 }
 
 =head2 published
@@ -124,6 +128,10 @@ sub as_hashref {
         hits     => 0,
         duration => 0,
         type => $self->type,
+        all_categories => [
+                      { id => "tvguide", term => "tvguide" },
+                      { id => "episodes", term => "episodes" },
+        ],
         url_safe_title => $self->url_safe_title,
     );
     return \%res;

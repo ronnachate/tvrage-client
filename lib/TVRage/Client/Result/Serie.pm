@@ -21,6 +21,12 @@ has 'data' => (
     lazy     => 1,
 );
 
+has 'imdb_data' => (
+    is       => 'ro',
+    builder  => '_build_imdb_data',
+    lazy     => 1,
+);
+
 has 'client' => (
     is       => 'ro',
     isa      => 'TVRage::Client',
@@ -32,6 +38,13 @@ has 'title' => (
     isa => 'Str',
     lazy => 1,
     builder => '_build_title',
+);
+
+has 'summary' => (
+    is       => 'ro',
+    isa      => 'Str',
+    lazy     => 1,
+    builder  =>  '_build_summary',
 );
 
 has 'genres' => (
@@ -94,6 +107,7 @@ sub _build_mtags {
     push(@$mtags,  { term => "series-id-".$self->id } );
     push(@$mtags,  { term => $self->url_safe_title } );
     push(@$mtags,  { term => "series-".$self->url_safe_title } );
+    push(@$mtags,  { term => "series" } );
     foreach my $genre ( @{$self->genres} ) {
     	push(@$mtags,  { term => $genre } );
     } 
@@ -105,9 +119,29 @@ sub _build_data {
     return $self->client->full_series_data( $self->id )->{Show};
 }
 
+sub _build_imdb_data {
+    my $self = shift;
+    
+    my $data = $self->client->search_imdb( $self->omdb_search_title);
+    if( $data->{root}->{response} eq 'True') {
+        return $data->{root}->{movie};
+    }
+    return;
+}
+
 sub _build_title {
     my ($self) = @_;
     return $self->data->{name}->{text};
+}
+
+sub _build_summary {
+    my ($self) = @_;
+    if( $self->imdb_data ) {
+        return $self->imdb_data->{plot};
+    }
+    else {
+        return '';
+    }
 }
 
 sub _build_genres {
@@ -145,6 +179,12 @@ sub published {
     return DateTime->now;
 }
 
+sub omdb_search_title {
+    my ($self) = @_;
+    my $title = $self->url_safe_title;
+    $title =~s/-/+/ig;  
+    return  $title
+}
 
 =head2 updated
 
@@ -157,26 +197,47 @@ sub updated {
     return DateTime->now;
 }
 
+sub imdb_rating {
+    my $self = shift;
+    return $self->imdb_data->{imdbRating};
+}
+
+sub actors {
+    my $self = shift;
+    return $self->imdb_data->{actors};
+}
+
+sub awards {
+    my $self = shift;
+    return $self->imdb_data->{awards};
+}
+
+sub totalseasons {
+    my $self = shift;
+    return $self->data->{totalseasons}->{text};
+}
+
 sub as_hashref {
     my $self = shift;
     my %res = (
-        map({$_ => $self->$_} qw/id title/),
+        map({$_ => $self->$_} qw/id title summary totalseasons type url_safe_title/),
         
         published  => DateTime::Format::Atom->format_datetime($self->published),
         updated    => DateTime::Format::Atom->format_datetime($self->updated),
         thumbnails => [ {map {$_ => $self->thumbnails->[0]->$_} qw/url width height/} ],
         mtags    =>  $self->mtags,
-        link     => "http://sumo.tv2.no/sport/live-sport/fotball/",
         hits     => 0,
         duration => 0,
-        summary  => 'test summary',
-        type => $self->type,
-        url_safe_title => $self->url_safe_title,
         all_categories => [
                       { id => "tvguide", term => "tvguide" },
                       { id => "series", term => "series" },
                     ],
     );
+    if( $self->imdb_data ) {
+        $res{'mdb_rating'} = $self->imdb_rating,
+        $res{'actors'} = $self->actors;
+        $res{'awards'} = $self->awards;
+    }
     return \%res;
 }
 
