@@ -6,6 +6,7 @@ use DateTime::Format::Strptime;
 use TVRage::Client::Result::Image;
 use TVRage::Client::Result::Season;
 use namespace::autoclean;
+use Try::Tiny;
 
 with 'TVRage::Client::Meta::Urlify';
 
@@ -80,9 +81,16 @@ sub _build_url_safe_title {
 
 sub _build_thumbnails {
     my ($self) = @_;
-    return [ 
-        TVRage::Client::Result::Image->new( url=> $self->data->{screencap}->{text} ),
-    ];
+    if( $self->data->{screencap} ) {
+        return [ 
+            TVRage::Client::Result::Image->new( url=> $self->data->{screencap}->{text} ),
+        ];
+    }
+    else {
+        return [
+            TVRage::Client::Result::Image->new( url=> "http://www.designofsignage.com/application/symbol/building/image/600x600/no-photo.jpg" ),
+        ];
+    }
 }
 
 sub _build_mtags {
@@ -114,12 +122,19 @@ Returns the published date as a DateTime object
 
 sub published {
     my ($self) = @_;
+    
     my $format = DateTime::Format::Strptime->new(
         pattern   => '%Y-%m-%d',
         time_zone => 'local',
         on_error  => 'croak',
     );
-    return $format->parse_datetime($self->data->{airdate}->{text});
+    try {
+    	return $format->parse_datetime($self->data->{airdate}->{text});
+    }
+    catch {
+    	return $format->parse_datetime("2014-01-01");
+    }
+
 }
 
 

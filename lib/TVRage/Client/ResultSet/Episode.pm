@@ -2,7 +2,6 @@ package TVRage::Client::ResultSet::Episode;
 
 use Moose;
 use TVRage::Client::Result::Episode;
-
 =head1 NAME
 
 TVRage::Client::ResultSet::Series
