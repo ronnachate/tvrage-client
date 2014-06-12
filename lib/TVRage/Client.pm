@@ -43,7 +43,7 @@ Performs a search against
 sub all_series {
     my ($self, $id) = @_;
     #my $url = $self->base_url.'/show_list.php';
-    my $url = $self->base_url.'/recaps/last_recaps.php?days=100';
+    my $url = $self->base_url.'/recaps/last_recaps.php?days=365';
     my $result = $self->fetch_result($url);
     return TVRage::Client::ResultSet::Serie->new({ data => $result->{recaps}, client => $self });
 }

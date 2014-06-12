@@ -36,10 +36,10 @@ sub items {
     my $items = [ ];
     if( $self->data ) {
     	my @ids =();
-    	@ids = uniq(@ids);
         for my $serie (@{$self->data->{show}}) {
         	push( @ids, $serie->{id}->{text});
         }
+        @ids = uniq(@ids);
         try {
                 return [ map { TVRage::Client::Result::Serie->new( { id=> $_ , client => $self->client } ) }  @ids ];
         } catch {
