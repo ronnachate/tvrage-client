@@ -2,6 +2,7 @@ package TVRage::Client::ResultSet::Serie;
 
 use Moose;
 use Try::Tiny;
+use List::MoreUtils qw( uniq );
 use TVRage::Client::Result::Serie;
 =head1 NAME
 
@@ -34,15 +35,18 @@ sub items {
     my $self = shift;
     my $items = [ ];
     if( $self->data ) {
+    	my @ids =();
+    	@ids = uniq(@ids);
         for my $serie (@{$self->data->{show}}) {
-            try {
-                push(@$items,  TVRage::Client::Result::Serie->new( { id => $serie->{id}->{text} , client => $self->client} ));
-            } catch {
-                warn "caught error: data error for :". $serie->{id}->{text}; # not $@
-            };
+        	push( @ids, $serie->{id}->{text});
         }
+        try {
+                return [ map { TVRage::Client::Result::Serie->new( { id=> $_ , client => $self->client } ) }  @ids ];
+        } catch {
+                warn "caught error: data error"; # not $@
+        };
     }
-    return $items;
+    return [];
 }
 
 sub first {
