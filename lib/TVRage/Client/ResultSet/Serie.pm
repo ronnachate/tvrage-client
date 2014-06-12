@@ -41,12 +41,12 @@ sub items {
         }
         @ids = uniq(@ids);
         try {
-                return [ map { TVRage::Client::Result::Serie->new( { id=> $_ , client => $self->client } ) }  @ids ];
+                $items = [ map { TVRage::Client::Result::Serie->new( { id=> $_ , client => $self->client } ) }  @ids ];
         } catch {
                 warn "caught error: data error"; # not $@
         };
     }
-    return [];
+    return $items;
 }
 
 sub first {
