@@ -228,6 +228,7 @@ sub as_hashref {
         mtags    =>  $self->mtags,
         hits     => 0,
         duration => 0,
+        genres   => $self->genres,
         all_categories => [
                       { id => "tvguide", term => "tvguide" },
                       { id => "series", term => "series" },
